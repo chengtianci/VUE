@@ -74,7 +74,7 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 			也可以迭代一个对象 value in object ，value属性值 object对象
 				两个参数{value,key} {值，键}
 				三个参数{value,key，index} {值，键，索引}
-				
+
 			！！在遍历对象时，是按 Object.keys() 的结果遍历，但是不能保证它的结果在不同的 JavaScript 引擎下是一致的。
 
 
@@ -96,16 +96,65 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 				结果渲染为：
 				<div class="static active"></div>
 
-	v-on    :   事件监听 .click = "function" 函数名
-				缩写 v-on.click="fun" ==>  @click="fun"
+	v-on    :   事件监听 :click = "function" 函数名
+				缩写 v-on:click="fun" ==>  @click="fun"
+				v-on:click = "code"//也可以写js代码eg:"count+=1"
+				事件修饰符:
+				.stop
+				.prevent
+				.capture
+				.self
+				.once
+				<!-- 阻止单击事件继续传播 -->
+				<a v-on:click.stop="doThis"></a>
 
+				<!-- 提交事件不再重载页面 -->
+				<form v-on:submit.prevent="onSubmit"></form>
+
+				<!-- 修饰符可以串联 -->
+				<a v-on:click.stop.prevent="doThat"></a>
+
+				<!-- 只有修饰符 -->
+				<form v-on:submit.prevent></form>
+
+				<!-- 添加事件监听器时使用事件捕获模式 -->
+				<!-- 即内部元素触发的事件先在此处处理，然后才交由内部元素自身进行处理 -->
+				<div v-on:click.capture="doThis">...</div>
+
+				<!-- 只当在 event.target 是当前元素自身时触发处理函数 -->
+				<!-- 即事件不是从内部元素触发的 -->
+				<div v-on:click.self="doThat">...</div>
+
+				!!!!!使用修饰符时，顺序很重要；相应的代码会以同样的顺序产生。因此，用 @click.prevent.self 会阻止所有的点击，而 @click.self.prevent 只会阻止对元素自身的点击。
+
+				!新增<!-- 点击事件将只会触发一次 -->
+					<a v-on:click.once="doThis"></a>
 	修饰符  ：(Modifiers) 是以半角句号 . 指明的特殊后缀，用于指出一个指令应该以特殊方式绑定。
 			  例如，.prevent 修饰符告诉 v-on 	指令对于触发的事件调用 event.preventDefault()：
 				<form v-on:submit.prevent="onSubmit">...</form>
+	数组的变异方法和非变异方法 : 变异方法(mutation method)会改变被这些方法调用的原始数组
+
+	  #注意事项
+
+		由于 JavaScript 的限制，Vue 不能检测以下变动的数组：
+
+		当你利用索引直接设置一个项时，例如：vm.items[indexOfItem] = newValue
+		当你修改数组的长度时，例如：vm.items.length = newLength
+
+		为了解决第一类问题，以下两种方式都可以实现和 vm.items[indexOfItem] = newValue 相同的效果，同时也将触发状态更新：
+		// Vue.set
+		Vue.set(example1.items, indexOfItem, newValue)
+		// Array.prototype.splice
+		example1.items.splice(indexOfItem, 1, newValue)
+
+		为了解决第二类问题，你可以使用 splice：
+		example1.items.splice(newLength)
 
 ~~~
 
 ~~~QUESTION
 	1.Mustache 语法不能作用在 HTML 特性上，遇到这种情况应该使用 v-bind 指令：？？
 	什么是不能作用？
+	2.再看看官方文档的  列表渲染/一个组件的v-for
+	3.vue.component()
 ~~~
